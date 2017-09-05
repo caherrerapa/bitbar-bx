@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-# This is by no means clean code :P
+
 require 'net/http'
 require 'json'
 
@@ -39,7 +39,7 @@ def output(d, fx, coinbase_price)
   asks = order_book['asks']
 
 
-  summary = "#{primary}-#{secondary} @ #{last_price} (#{change}%) ~(#{'%.2f' % last_price_usd}) USD, Coinbase: #{coinbase_price} USD"
+  summary = "#{primary}-#{secondary} @ #{last_price} (#{change}%) ~(#{'%.2f' % last_price_usd} vs Coinbase: #{coinbase_price}) USD"
   details = [
     "---",
     "24h volume : #{d['volume_24hours']} #{secondary}",
