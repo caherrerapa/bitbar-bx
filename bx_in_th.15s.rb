@@ -4,9 +4,9 @@ require 'net/http'
 require 'json'
 
 # See pairing id at https://bx.in.th/api/pairing/
-PAIRING_ID = 26 # THB-OMG
+#PAIRING_ID = 26 # THB-OMG
 #PAIRING_ID = 1 # THB-BTC
-#PAIRING_ID = 21 # THB-ETH
+PAIRING_ID = 21 # THB-ETH
 
 def run
   url = 'https://bx.in.th/api/'
