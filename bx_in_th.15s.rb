@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-
+# This is by no means clean code :P
 require 'net/http'
 require 'json'
 
@@ -8,23 +8,38 @@ require 'json'
 #PAIRING_ID = 1 # THB-BTC
 PAIRING_ID = 21 # THB-ETH
 
+def fx
+  url = 'http://api.fixer.io/latest?symbols=THB&base=USD'
+  response = Net::HTTP.get(URI(url))
+  data = JSON.parse(response)['rates']['THB']
+end
+
+def coinbase_price
+  url = 'https://api.coinbase.com/v2/prices/ETH-USD/spot'
+  response = Net::HTTP.get(URI(url))
+  data = JSON.parse(response)['data']['amount']
+end
+
 def run
   url = 'https://bx.in.th/api/'
   response = Net::HTTP.get(URI(url))
   data = JSON.parse(response)[PAIRING_ID.to_s]
-  output(data)
+
+  output(data, fx, coinbase_price)
 end
 
-def output(d)
+def output(d, fx, coinbase_price)
   primary = d['primary_currency']
   secondary = d['secondary_currency']
   last_price = d['last_price']
+  last_price_usd = d['last_price'] / fx
   change = d['change']
   order_book = d['orderbook']
   bids = order_book['bids']
   asks = order_book['asks']
 
-  summary = "#{primary}-#{secondary} @ #{last_price} (#{change}%)"
+
+  summary = "#{primary}-#{secondary} @ #{last_price} (#{change}%) ~(#{'%.2f' % last_price_usd}) USD, Coinbase: #{coinbase_price} USD"
   details = [
     "---",
     "24h volume : #{d['volume_24hours']} #{secondary}",
