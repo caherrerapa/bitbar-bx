@@ -20,26 +20,37 @@ def coinbase_price
   data = JSON.parse(response)['data']['amount']
 end
 
+def poloniex_price
+  url = 'https://poloniex.com/public?command=returnTicker'
+  response = Net::HTTP.get(URI(url))
+  data = JSON.parse(response)['USDT_ETH']['last']
+end
+
+def kraken_price
+  url = 'https://api.kraken.com/0/public/Ticker?pair=ETHUSD'
+  response = Net::HTTP.get(URI(url))
+  data = JSON.parse(response)['result']['XETHZUSD']['c'][0]
+end
+
 def run
   url = 'https://bx.in.th/api/'
   response = Net::HTTP.get(URI(url))
   data = JSON.parse(response)[PAIRING_ID.to_s]
 
-  output(data, fx, coinbase_price)
+  output(data)
 end
 
-def output(d, fx, coinbase_price)
+def output(d)
   primary = d['primary_currency']
   secondary = d['secondary_currency']
-  last_price = d['last_price']
+  last_price = r(d['last_price'])
   last_price_usd = d['last_price'] / fx
   change = d['change']
   order_book = d['orderbook']
   bids = order_book['bids']
   asks = order_book['asks']
 
-
-  summary = "#{primary}-#{secondary} @ #{last_price} (#{change}%) (~#{'%.2f' % last_price_usd} vs Coinbase: #{coinbase_price}) USD"
+  summary = "#{secondary} @#{last_price} (B: #{r(last_price_usd)}, C: #{r(coinbase_price)}, P: #{r(poloniex_price)}, K: #{r(kraken_price)} USD)"
   details = [
     "---",
     "24h volume : #{d['volume_24hours']} #{secondary}",
@@ -59,6 +70,10 @@ def output(d, fx, coinbase_price)
     summary,
     *details,
   ].each(&method(:puts))
+end
+
+def r(value)
+  "%g" % value.to_f.round(2)
 end
 
 begin
