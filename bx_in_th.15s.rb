@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-
+  
 require 'net/http'
 require 'json'
 
@@ -12,6 +12,12 @@ def fx
   url = 'http://api.fixer.io/latest?symbols=THB&base=USD'
   response = Net::HTTP.get(URI(url))
   data = JSON.parse(response)['rates']['THB']
+end
+
+def bitfinex_price
+  url= 'https://api.bitfinex.com/v1/pubticker/ethusd'
+  response = Net::HTTP.get(URI(url))
+  data = JSON.parse(response)['last_price']
 end
 
 def coinbase_price
@@ -50,7 +56,7 @@ def output(d)
   bids = order_book['bids']
   asks = order_book['asks']
 
-  summary = "#{secondary} @#{last_price} (B: #{r(last_price_usd)}, C: #{r(coinbase_price)}, P: #{r(poloniex_price)}, K: #{r(kraken_price)} USD)"
+  summary = "#{secondary} @#{last_price} (BX: #{r(last_price_usd)}, C: #{r(coinbase_price)}, BF: #{r(bitfinex_price)}, K: #{r(kraken_price)} USD) #{Time.now.strftime("%H:%M:%S")}"
   details = [
     "---",
     "24h volume : #{d['volume_24hours']} #{secondary}",
